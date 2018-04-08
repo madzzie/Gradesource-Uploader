@@ -6,11 +6,24 @@
 from bs4 import BeautifulSoup
 import re, requests
 import csv
+import ssl
+
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.poolmanager import PoolManager
+import ssl
 
 class GradesourceSession:
+
+    class MyAdapter(HTTPAdapter):
+        def init_poolmanager(self, connections, maxsize, block=False):
+            self.poolmanager = PoolManager(num_pools=connections,
+                                        maxsize=maxsize,
+                                        block=block,
+                                        ssl_version=ssl.PROTOCOL_TLSv1)
     #'global' cookies and session for method uses
     cookies = None
     s = requests.session()
+    s.mount('https://', MyAdapter())
     savedAccount = {}
     savedPIDAccount = {}
     savedName = {}
